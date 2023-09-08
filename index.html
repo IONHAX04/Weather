@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Application</title>
+
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
+
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        body{
+            background:linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .7)), url(https://wallpapers.com/images/hd/perfect-weather-with-gradient-sky-ym0nn79vhoqg34v3.jpg);   
+        }
+
+        .container {
+            border: 1px solid black;
+            padding: 4%;
+            margin: 8%;
+            border-radius: 10px;
+            background: white !important;
+            /* color: white; */
+            /* background: url(https://img.freepik.com/premium-vector/clouds-stars-sun-blue-background-childrens-vector-illustration-sky_153074-219.jpg) no-repeat; */
+            /* background: linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .6)), url(https://img.freepik.com/premium-vector/clouds-stars-sun-blue-background-childrens-vector-illustration-sky_153074-219.jpg); */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .search-box ul li {
+            list-style: none;
+            font-size: 20px;
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <div class="container col-lg-6 md-4 sm-4">
+            <h1>Weather Tracking App</h1>
+            <div class="search-box col-lg-6">
+                <ul>
+                    <li>To know the weather in your location?</li>
+                    <button class="btn btn-primary" id="yourLocationButton">Click here</button>
+                    <li>To know the weather by search</li>
+                    <button class="btn btn-primary" id="choosePlaceButton">Search here</button>
+                </ul>
+            </div>
+            <div class="weather-info" id="weatherInfo">
+
+            </div>
+        </div>
+    </center>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        function fetchWeather(city) {
+            const apiKey = "cc847f45fd16e6390a749ee18ac0437b";
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+
+            fetch(apiUrl)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.cod === 200) {
+                        const temperature = (data.main.temp - 273.15).toFixed(2);
+                        const description = data.weather[0].description;
+                        const cityName = data.name;
+                        const country = data.sys.country;
+
+                        const weatherData = `
+                            <h2>${cityName}, ${country}</h2>
+                            <p>Temperature: ${temperature}°C</p>
+                            <p>Description: ${description}</p>
+                        `;
+
+                        Swal.fire({
+                            title: 'Weather Information',
+                            html: weatherData,
+                            icon: 'info'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'City Not Found',
+                            text: 'Please enter a valid city name.',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching data: ", error);
+                });
+        }
+
+        function fetchLocationAndWeather() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            const city = data.address.city || data.address.town || data.address.village || data.address.hamlet;
+
+                            if (city) {
+                                fetchWeather(city);
+                            } else {
+                                Swal.fire({
+                                    title: 'Location Not Found',
+                                    text: 'Unable to determine your location.',
+                                    icon: 'error'
+                                });
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error fetching location data: ", error);
+                        });
+                });
+            } else {
+                Swal.fire({
+                    title: 'Geolocation Not Supported',
+                    text: 'Your browser does not support geolocation.',
+                    icon: 'error'
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const yourLocationButton = document.getElementById("yourLocationButton");
+            const choosePlaceButton = document.getElementById("choosePlaceButton");
+
+            yourLocationButton.addEventListener("click", function () {
+                fetchLocationAndWeather();
+            });
+
+            choosePlaceButton.addEventListener("click", function () {
+                Swal.fire({
+                    title: 'Enter City Name',
+                    input: 'text',
+                    inputPlaceholder: 'Enter City Name',
+                    showCancelButton: true,
+                    confirmButtonText: 'Get Weather',
+                    cancelButtonText: 'Cancel',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'City name is required';
+                        } else {
+                            fetchWeather(value);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

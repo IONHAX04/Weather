@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Browser Name, Location, and Cookies</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+</head>
+<body>
+    <center>
+        <div class="container col-lg-6 md-4 sm-4">
+            <h1>Get Browser Name, Location, and Cookies</h1>
+            <button class="btn btn-primary" id="getInfoButton">Get Info</button>
+        </div>
+    </center>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.5/platform.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const getInfoButton = document.getElementById("getInfoButton");
+
+            getInfoButton.addEventListener("click", function () {
+                const browserName = platform.name;
+                let message = `Hello! You are using ${browserName} browser.`;
+
+                function getAllCookies() {
+                    const cookies = document.cookie;
+                    return cookies;
+                }
+
+                const allCookies = getAllCookies();
+
+                if (allCookies) {
+                    message += `\nCookies:\n${allCookies}`;
+                } else {
+                    message += "\nNo cookies found.";
+                }
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const latitude = position.coords.latitude;
+                            const longitude = position.coords.longitude;
+
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    const placeName = data.display_name || 'Unknown Place';
+                                    message += `\nPlace Name: ${placeName}`;
+
+                                    Swal.fire({
+                                        title: 'Browser Information, Location, and Cookies',
+                                        text: message,
+                                        icon: 'info'
+                                    });
+                                })
+                                .catch((error) => {
+                                    console.error("Error fetching location data: ", error);
+                                    Swal.fire({
+                                        title: 'Browser Information and Location',
+                                        text: message,
+                                        icon: 'info'
+                                    });
+                                });
+                        },
+                        (error) => {
+                            Swal.fire({
+                                title: 'Browser Information, Location, and Cookies',
+                                text: message,
+                                icon: 'info'
+                            });
+                        }
+                    );
+                } else {
+                    Swal.fire({
+                        title: 'Browser Information, Location, and Cookies',
+                        text: message,
+                        icon: 'info'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Browser Name and Location</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+</head>
+<body>
+    <center>
+        <div class="container col-lg-6 md-4 sm-4">
+            <h1>Get Browser Name and Location</h1>
+            <button class="btn btn-primary" id="getInfoButton">Get Info</button>
+        </div>
+    </center>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.5/platform.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const getInfoButton = document.getElementById("getInfoButton");
+
+            getInfoButton.addEventListener("click", function () {
+                const browserName = platform.name;
+                let message = `Hello! You are using ${browserName} browser.`;
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const latitude = position.coords.latitude;
+                            const longitude = position.coords.longitude;
+
+                            // Fetch place name based on latitude and longitude
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    const placeName = data.display_name || 'Unknown Place';
+                                    message += `\nPlace Name: ${placeName}`;
+
+                                    Swal.fire({
+                                        title: 'Browser Information and Location',
+                                        text: message,
+                                        icon: 'info'
+                                    });
+                                })
+                                .catch((error) => {
+                                    console.error("Error fetching location data: ", error);
+                                    Swal.fire({
+                                        title: 'Browser Information and Location',
+                                        text: message,
+                                        icon: 'info'
+                                    });
+                                });
+                        },
+                        (error) => {
+                            Swal.fire({
+                                title: 'Browser Information',
+                                text: message,
+                                icon: 'info'
+                            });
+                        }
+                    );
+                } else {
+                    Swal.fire({
+                        title: 'Browser Information',
+                        text: message,
+                        icon: 'info'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html> -->
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Browser Name and Location</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+</head>
+<body>
+    <center>
+        <div class="container col-lg-6 md-4 sm-4">
+            <h1>Get Browser Name and Location</h1>
+            <button class="btn btn-primary" id="getInfoButton">Get Info</button>
+        </div>
+    </center>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.5/platform.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const getInfoButton = document.getElementById("getInfoButton");
+
+            getInfoButton.addEventListener("click", function () {
+                const browserName = platform.name;
+                let message = `Hello! You are using ${browserName} browser.`;
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const latitude = position.coords.latitude;
+                            const longitude = position.coords.longitude;
+                            message += `\nLatitude: ${latitude.toFixed(6)}, Longitude: ${longitude.toFixed(6)}`;
+
+                            Swal.fire({
+                                title: 'Browser Information and Location',
+                                text: message,
+                                icon: 'info'
+                            });
+                        },
+                        (error) => {
+                            Swal.fire({
+                                title: 'Browser Information',
+                                text: message,
+                                icon: 'info'
+                            });
+                        }
+                    );
+                } else {
+                    Swal.fire({
+                        title: 'Browser Information',
+                        text: message,
+                        icon: 'info'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+     -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Browser Name</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+</head>
+<body>
+    <center>
+        <div class="container col-lg-6 md-4 sm-4">
+            <h1>Get Browser Name</h1>
+            <button class="btn btn-primary" id="getBrowserNameButton">Get Browser Name</button>
+        </div>
+    </center>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.5/platform.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const getBrowserNameButton = document.getElementById("getBrowserNameButton");
+
+            getBrowserNameButton.addEventListener("click", function () {
+                const browserName = platform.name;
+                const message = `Hello! You are using ${browserName} browser.`;
+
+                Swal.fire({
+                    title: 'Browser Information',
+                    text: message,
+                    icon: 'info'
+                });
+            });
+        });
+    </script>
+</body>
+</html> -->
